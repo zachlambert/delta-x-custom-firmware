@@ -1,0 +1,5 @@
+old/
+build/
+.clangd/
+*.swp
+compile_commands.json
