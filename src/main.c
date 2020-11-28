@@ -1,7 +1,11 @@
 #include "robot.h"
+#include "uart.h"
 
 int main(void)
 {
+    UartConfig uart_config = uart_create_config();
+    uart_init(&uart_config);
+
     // Can make static to see data usage at compile time.
     // Its going to be put on the stack at the start of the program anyway.
     static Robot robot;

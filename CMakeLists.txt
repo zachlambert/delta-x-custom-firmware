@@ -14,6 +14,7 @@ add_executable(main.elf
     src/main.c
     src/pin.c
     src/robot.c
+    src/uart.c
 )
 target_include_directories(main.elf
     PRIVATE include /usr/lib/avr/include
