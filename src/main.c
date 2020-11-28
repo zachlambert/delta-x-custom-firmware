@@ -30,6 +30,7 @@
 //   Program: 494
 //   Data: 0
 // This is good.
+// (Removing inline -> Program: 614, Data: 4)
 // 
 // Now that I think about it, there isn't much point using pointers to pins
 // when the Pin itself is only 1 byte.
