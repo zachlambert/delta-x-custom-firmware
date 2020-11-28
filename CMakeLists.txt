@@ -12,6 +12,8 @@ include(atmega2560.cmake)
 
 add_executable(main.elf
     src/main.c
+    src/pin.c
+    src/config.c
 )
 target_include_directories(main.elf
     PRIVATE include /usr/lib/avr/include
