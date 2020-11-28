@@ -3,21 +3,27 @@
 #include "robot.h"
 #include "config.h"
 
-void robot_init(void)
+void robot_init(Robot *robot)
 {
     init_output(led);
     init_output(led2);
     init_output(led3);
+
+    robot->counter = 0;
 }
 
-void robot_loop(void)
+void robot_loop(Robot *robot)
 {
-    set(led);
-    set(led2);
-    set(led3);
-    _delay_ms(500);
-    clear(led);
-    clear(led2);
-    clear(led3);
-    _delay_ms(500);
+    robot -> counter++;
+    if (robot->counter > 4) {
+        robot->counter = 0;
+        set(led);
+        set(led2);
+        set(led3);
+    } else {
+        clear(led);
+        clear(led2);
+        clear(led3);
+    }
+    _delay_ms(100);
 }
