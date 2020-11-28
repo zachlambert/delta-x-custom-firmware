@@ -26,6 +26,15 @@
 //   Data: 4
 //
 // What if you just remove PinImpl and create static Pin data?
+// With inline functions, gives:
+//   Program: 494
+//   Data: 0
+// This is good.
+// 
+// Now that I think about it, there isn't much point using pointers to pins
+// when the Pin itself is only 1 byte.
+// Also, if the pin is treated as static data, the compiler can treat it
+// as constant and do appropriate optimisations, I think.
 
 #include <util/delay.h>
 #include "pin.h"

@@ -10,19 +10,3 @@ volatile uint8_t *const DDRx[] PROGMEM = {
     &DDRA, &DDRB, &DDRC, &DDRD, &DDRE, &DDRF, &DDRG, &DDRH,
     &DDRJ, &DDRK, &DDRL
 };
-
-void init_output(Pin pin)
-{
-    PREG(PORTx[pin->port]) |= 1<<pin->n;
-    PREG(DDRx[pin->port]) |= 1<<pin->n;
-}
-
-void set(Pin pin)
-{
-    PREG(PORTx[pin->port]) |= 1<<pin->n;
-}
-
-void clear(Pin pin)
-{
-    PREG(PORTx[pin->port]) &= ~(1<<pin->n);
-}

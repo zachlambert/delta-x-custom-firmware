@@ -22,9 +22,7 @@ typedef enum {
 typedef struct {
     uint8_t port: 4;
     uint8_t n: 3;
-} PinImpl;
-
-typedef const PinImpl *const Pin;
+} Pin;
 
 #define PIN_B5 { .port=PORT_B, .n=5 }
 #define PIN_B6 { .port=PORT_B, .n=6 }
@@ -32,8 +30,23 @@ typedef const PinImpl *const Pin;
 
 #define PREG(REG) (*(volatile uint8_t *const)(pgm_read_ptr(&REG)))
 
-void init_output(Pin pin);
-void set(Pin pin);
-void clear(Pin pin);
+extern volatile uint8_t *const PORTx[] PROGMEM;
+extern volatile uint8_t *const DDRx[] PROGMEM;
+
+inline void init_output(Pin pin)
+{
+    PREG(PORTx[pin.port]) |= 1<<pin.n;
+    PREG(DDRx[pin.port]) |= 1<<pin.n;
+}
+
+inline void set(Pin pin)
+{
+    PREG(PORTx[pin.port]) |= 1<<pin.n;
+}
+
+inline void clear(Pin pin)
+{
+    PREG(PORTx[pin.port]) &= ~(1<<pin.n);
+}
 
 #endif
