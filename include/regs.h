@@ -3,16 +3,22 @@
 
 #include <stdint.h>
 
-inline void reg_write_bit(volatile uint8_t *reg, uint8_t bit, uint8_t value)
+inline void reg_set(volatile uint8_t *reg, uint8_t bit)
 {
-    if (value) {
-        *reg |= 1<<bit;
-    } else {
-        *reg &= ~(1<<bit);
-    }
+    *reg |= 1<<bit;
 }
 
-inline uint8_t reg_read_bit(volatile uint8_t *reg, uint8_t bit)
+inline void reg_clear(volatile uint8_t * reg, uint8_t bit)
+{
+    *reg &= ~(1<<bit);
+}
+
+inline void reg_write(volatile uint8_t *reg, uint8_t bit, uint8_t value)
+{
+    value ? reg_set(reg, bit) : reg_clear(reg, bit);
+}
+
+inline uint8_t reg_read(volatile uint8_t *reg, uint8_t bit)
 {
     return (*reg >> bit) & 0x01;
 }

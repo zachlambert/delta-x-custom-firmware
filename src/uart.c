@@ -37,9 +37,9 @@ void uart_init(UartConfig *config)
     UBRR0L = (uint8_t)ubbr_value;
 
     // Enable receiver
-    reg_write_bit(&UCSR0B, RXEN0, 1);
+    reg_write(&UCSR0B, RXEN0, 1);
     // Enable transmitter
-    reg_write_bit(&UCSR0B, TXEN0, 1);
+    reg_write(&UCSR0B, TXEN0, 1);
 
     // USART mode
     reg_write_mask(&UCSR0C, UMSEL00, 0b11, config->mode);
@@ -48,10 +48,10 @@ void uart_init(UartConfig *config)
     reg_write_mask(&UCSR0C, UPM00, 0b11, config->parity);
 
     // Stop bits
-    reg_write_bit(&UCSR0C, USBS0, config->stop_bits);
+    reg_write(&UCSR0C, USBS0, config->stop_bits);
 
     // Number of bits
-    reg_write_bit(&UCSR0B, UCSZ02, config->bits >> 2);
+    reg_write(&UCSR0B, UCSZ02, config->bits >> 2);
     reg_write_mask(&UCSR0C, UCSZ00, 0b11, config->bits);
 
     static FILE uart_ostream = FDEV_SETUP_STREAM(
@@ -69,13 +69,13 @@ void uart_init(UartConfig *config)
 
 void uart_write_byte(uint8_t data)
 {
-    while (!reg_read_bit(&UCSR0A, UDRE0));
+    while (!reg_read(&UCSR0A, UDRE0));
     UDR0 = data;
 }
 
 uint8_t uart_read_byte(void)
 {
-    while (!reg_read_bit(&UCSR0A, UDRE0));
+    while (!reg_read(&UCSR0A, UDRE0));
     return UDR0;
 }
 

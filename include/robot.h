@@ -2,7 +2,7 @@
 #define ROBOT_H
 
 typedef struct {
-    int counter;
+    int endstop;
 } Robot;
 
 // Since these functions are only used once, it makes sense

@@ -6,10 +6,8 @@ int main(void)
     UartConfig uart_config = uart_create_config();
     uart_init(&uart_config);
 
-    printf("Testing\n");
-    return 0;
-    // Can make static to see data usage at compile time.
-    // Its going to be put on the stack at the start of the program anyway.
+    printf("Starting\n");
+
     static Robot robot;
     robot_init(&robot);
     while (1) {

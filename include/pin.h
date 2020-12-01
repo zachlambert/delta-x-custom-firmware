@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
+#include "regs.h"
 
 typedef enum {
     PORT_A,
@@ -24,29 +25,54 @@ typedef struct {
     uint8_t n: 3;
 } Pin;
 
-#define PIN_B5 { .port=PORT_B, .n=5 }
-#define PIN_B6 { .port=PORT_B, .n=6 }
-#define PIN_B7 { .port=PORT_B, .n=7 }
-
-#define PREG(REG) (*(volatile uint8_t *const)(pgm_read_ptr(&REG)))
+#define PREG(REG) ((volatile uint8_t *const)(pgm_read_ptr(&REG)))
 
 extern volatile uint8_t *const PORTx[] PROGMEM;
 extern volatile uint8_t *const DDRx[] PROGMEM;
+extern volatile uint8_t *const PINx[] PROGMEM;
 
-inline void init_output(Pin pin)
+inline void pin_init_output(Pin pin)
 {
-    PREG(PORTx[pin.port]) |= 1<<pin.n;
-    PREG(DDRx[pin.port]) |= 1<<pin.n;
+    reg_set(PREG(PORTx[pin.port]), pin.n);
+    reg_set(PREG(DDRx[pin.port]), pin.n);
 }
 
-inline void set(Pin pin)
+inline void pin_init_output_inverted(Pin pin)
 {
-    PREG(PORTx[pin.port]) |= 1<<pin.n;
+    reg_clear(PREG(PORTx[pin.port]), pin.n);
+    reg_set(PREG(DDRx[pin.port]), pin.n);
 }
 
-inline void clear(Pin pin)
+inline void pin_init_input(Pin pin)
 {
-    PREG(PORTx[pin.port]) &= ~(1<<pin.n);
+    reg_clear(PREG(PORTx[pin.port]), pin.n);
+    reg_clear(PREG(DDRx[pin.port]), pin.n);
+}
+
+inline void pin_init_input_pullup(Pin pin)
+{
+    reg_set(PREG(PORTx[pin.port]), pin.n);
+    reg_clear(PREG(DDRx[pin.port]), pin.n);
+}
+
+inline void pin_set(Pin pin)
+{
+    reg_set(PREG(PORTx[pin.port]), pin.n);
+}
+
+inline void pin_clear(Pin pin)
+{
+    reg_clear(PREG(PORTx[pin.port]), pin.n);
+}
+
+inline void pin_write(Pin pin, uint8_t value)
+{
+    reg_write(PREG(PORTx[pin.port]), pin.n, value);
+}
+
+inline uint8_t pin_read(Pin pin)
+{
+    return reg_read(PREG(PINx[pin.port]), pin.n);
 }
 
 #endif
