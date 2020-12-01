@@ -1,8 +1,11 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#include <stdint.h>
+
 typedef struct {
-    int endstop;
+    uint8_t endstop;
+    uint16_t counter;
 } Robot;
 
 // Since these functions are only used once, it makes sense
