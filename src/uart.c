@@ -30,11 +30,6 @@ char uart_getchar(FILE *stream)
 
 void uart_init(UartConfig *config)
 {
-    UartConfig default_config = uart_create_config();
-    if (!config) {
-        config = &default_config;
-    }
-
     uint16_t ubbr_value = ((F_CPU/16)/config->baud_rate) - 1;
 
     // Set baud rate
