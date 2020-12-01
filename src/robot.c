@@ -38,9 +38,13 @@ void robot_init(Robot *robot)
     reg_set(&TIMSK1, OCIE1A);
 }
 
+int on = 0;
 ISR(TIMER1_COMPA_vect)
 {
     g_robot->counter++;
+    if (g_robot->counter %4 == 0)
+        on = !on;
+    pin_write(theta_1_pulse, on);
 }
 
 void robot_loop(Robot *robot)
