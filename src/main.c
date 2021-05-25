@@ -1,24 +1,80 @@
 #include "robot.h"
 #include "uart.h"
+#include <stdbool.h>
+#include <string.h>
+#include <util/delay.h>
+
+#define BUFFER_N 14
+typedef struct {
+    uint8_t data[BUFFER_N];
+    int head;
+    uint16_t special;
+    uint16_t special2;
+} Buffer;
+
+Buffer buffer_create(void)
+{
+    Buffer buffer;
+    memset(buffer.data, 0, BUFFER_N);
+    buffer.head = 0;
+    buffer.special = 0xF770;
+    buffer.special2 = 0xE661;
+    return buffer;
+}
+
+void buffer_update(Buffer *buffer)
+{
+    buffer->data[buffer->head] = uart_read_byte();
+    buffer->head = (buffer->head+1)%BUFFER_N;
+}
+
+bool buffer_match(Buffer *buffer)
+{
+    int index = buffer->head;
+    int index2 = (buffer->head+1)%BUFFER_N;
+    uint16_t start = buffer->data[index2]<<8 | buffer->data[index];
+    if (start != buffer->special) return false;
+    index = (buffer->head-2)%BUFFER_N;
+    index2 = (buffer->head-1)%BUFFER_N;
+    uint16_t end = buffer->data[index2]<<8 | buffer->data[index];
+    if (end != buffer->special2) return false;
+    return true;
+}
+
+uint16_t buffer_read_value(Buffer *buffer, int i)
+{
+    int index = (buffer->head+2 + 2*i)%BUFFER_N;
+    int index2 = (index+1)%BUFFER_N;
+    return buffer->data[index2]<<8 | buffer->data[index];
+}
 
 int main(void)
 {
     UartConfig uart_config = uart_create_config();
     uart_init(&uart_config);
 
-    uint16_t cmd[5];
+    Buffer buffer = buffer_create();
+
+    _delay_ms(1000);
+    for (int j = 0; j< 20; j++) {
+        buffer_update(&buffer);
+    }
+    // if (buffer_match(&buffer)) break;
     while (1) {
-        for (int i = 0; i < 5; i++) {
-            cmd[i] = uart_read_uint16();
-        }
-        for (int i = 0; i < 5; i++) {
-            uart_write_uint16(cmd[i]);
+        for (int i = -1; i < 5; i++ ) {
+            printf("%i: 0x%x\n", i, buffer_read_value(&buffer, i));
         }
     }
 
-    return 0;
+    // for (int i = 0; i < 5; i++) {
+    //     printf("0x%x\n", buffer_read_value(&buffer, i));
+    // }
+    while (1) {
+        printf("Starting\n");
+    }
 
-    // printf("Starting\n");
+
+    return 0;
 
     static Robot robot;
     robot_init(&robot);
