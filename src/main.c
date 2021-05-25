@@ -53,20 +53,13 @@ int main(void)
     UartConfig uart_config = uart_create_config();
     uart_init(&uart_config);
 
-    Buffer buffer = buffer_create();
+    // Buffer buffer = buffer_create();
 
-    _delay_ms(1000);
-    for (int j = 0; j< 20; j++) {
-        buffer_update(&buffer);
-        if (buffer_match(&buffer)) break;
-    }
-
-    while (1) {
-        printf("Starting\n");
-    }
-
-
-    return 0;
+    // _delay_ms(1000);
+    // for (int j = 0; j< 20; j++) {
+    //     buffer_update(&buffer);
+    //     if (buffer_match(&buffer)) break;
+    // }
 
     static Robot robot;
     robot_init(&robot);

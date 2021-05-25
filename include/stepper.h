@@ -2,6 +2,7 @@
 #define STEPPER_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "pin.h"
 
 typedef struct {
@@ -9,13 +10,11 @@ typedef struct {
     Pin pin_dir;
     Pin pin_en;
     Pin pin_endstop;
-    uint8_t moving;
-    uint8_t pulse_value;
-    uint8_t dir;
-    uint16_t pulse_half_period;
-    int pos_steps;
-    double pos;
-    double vel;
+    bool enabled;
+    int target;
+    int pos;
+    int dir;
+    bool zeroed;
 } Stepper;
 
 #endif
