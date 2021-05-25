@@ -75,7 +75,7 @@ void uart_write_byte(uint8_t data)
 
 uint8_t uart_read_byte(void)
 {
-    while (!reg_read(&UCSR0A, UDRE0));
+    while (!reg_read(&UCSR0A, RXC0));
     return UDR0;
 }
 
