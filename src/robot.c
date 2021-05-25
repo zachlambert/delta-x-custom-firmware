@@ -1,6 +1,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
+#include <util/delay.h>
 
 #include "robot.h"
 #include "uart.h"
@@ -11,14 +12,13 @@ Robot *g_robot;
 uint8_t on = 0;
 ISR(TIMER1_COMPA_vect)
 {
-    g_robot->counter++;
     on = !on;
     for (int i = 0; i < 3; i++) {
         Stepper *stepper = &g_robot->steppers[i];
         if (stepper->enabled) {
             pin_write(stepper->pin_pulse, on);
-            stepper->pos += stepper->dir;
             if (!stepper->zeroed) continue;
+            stepper->pos += stepper->dir;
             if (stepper->pos == stepper->target ||
                 (stepper->pos > stepper->target && stepper->dir>0) ||
                 (stepper->pos < stepper->target && stepper->dir<0))
@@ -32,8 +32,6 @@ ISR(TIMER1_COMPA_vect)
 void robot_init(Robot *robot)
 {
     g_robot = robot;
-
-    robot->counter = 0;
 
     // 54, 55, 38, 3
     robot->steppers[0].pin_pulse.port = PORT_F;
@@ -82,7 +80,7 @@ void robot_init(Robot *robot)
     reg_write_mask(&TCCR1B, CS10, 0b111, 1);
 
     // Set timer end (OCRnA)
-    OCR1A = 3200;
+    OCR1A = 7000;
 
     // Enable interrupts
     sei();
@@ -107,20 +105,34 @@ void robot_init(Robot *robot)
             } else {
                 robot->steppers[i].enabled = false;
                 robot->steppers[i].zeroed = true;
+                robot->steppers[i].pos = 0;
             }
         }
         if (zeroed) break;
     }
 
-    for (int i = 0; i < 3; i++) {
-        robot->steppers[i].pos = 0;
-        robot->steppers[i].target = 1000;
-        robot->steppers[i].dir = 1;
-        pin_write(robot->steppers[i].pin_dir, 1);
-        robot->steppers[i].enabled = true;
-    }
+    UartConfig uart_config = uart_create_config();
+    uart_init(&uart_config);
 }
 
 void robot_loop(Robot *robot)
 {
+    uint32_t reading = uart_read_uint32();
+    uint16_t signature = reading;
+    const uint16_t signatures[] = {111, 222, 333};
+    for (int i = 0; i < 3; i++) {
+        if (signatures[i] == signature) {
+            Stepper *stepper = &robot->steppers[i];
+            stepper->target = reading >> 16;
+            if (stepper->target > stepper->pos) {
+                robot->steppers[i].dir = 1;
+                pin_write(robot->steppers[i].pin_dir, 1);
+                robot->steppers[i].enabled = true;
+            } else if (stepper->target < stepper->pos) {
+                robot->steppers[i].dir = -1;
+                pin_write(robot->steppers[i].pin_dir, 0);
+                robot->steppers[i].enabled = true;
+            }
+        }
+    }
 }

@@ -6,7 +6,6 @@
 
 typedef struct {
     Stepper steppers[3];
-    uint16_t counter;
 } Robot;
 
 // Since these functions are only used once, it makes sense
